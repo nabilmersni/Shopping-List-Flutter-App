@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class Category {
   const Category(
-    this.type,
+    this.title,
     this.color,
   );
 
-  final String type;
+  final String title;
   final Color color;
 }
