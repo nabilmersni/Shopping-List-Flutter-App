@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:shopping_list/data/dummy_items.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:shopping_list/providers/groceries_provider.dart';
 import 'package:shopping_list/screens/add_item_screen.dart';
 
-class GroceriesScreen extends StatefulWidget {
+class GroceriesScreen extends ConsumerStatefulWidget {
   const GroceriesScreen({super.key});
 
   @override
-  State<GroceriesScreen> createState() => _GroceriesScreenState();
+  ConsumerState<GroceriesScreen> createState() => _GroceriesScreenState();
 }
 
-class _GroceriesScreenState extends State<GroceriesScreen> {
+class _GroceriesScreenState extends ConsumerState<GroceriesScreen> {
   void addItem() {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -20,6 +22,7 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final groceriesItem = ref.watch(groceryProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your groceries'),
@@ -31,26 +34,26 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
         ],
       ),
       body: ListView.builder(
-        itemCount: groceryItems.length,
+        itemCount: groceriesItem.length,
         itemBuilder: (ctx, index) => ListTile(
           onTap: () {},
           leading: Container(
             width: 30,
             height: 30,
             decoration: BoxDecoration(
-              color: groceryItems[index].category.color,
+              color: groceriesItem[index].category.color,
               borderRadius: BorderRadius.circular(5),
             ),
           ),
           title: Text(
-            groceryItems[index].name,
+            groceriesItem[index].name,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w400,
             ),
           ),
           trailing: Text(
-            groceryItems[index].quantity.toString(),
+            groceriesItem[index].quantity.toString(),
             style: const TextStyle(
               fontSize: 14,
             ),

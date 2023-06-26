@@ -1,16 +1,39 @@
-import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
-import 'package:shopping_list/data/categories.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AddItemScreen extends StatefulWidget {
+import 'package:shopping_list/data/categories.dart';
+import 'package:shopping_list/models/category.dart';
+import 'package:shopping_list/models/grocery_item.dart';
+import 'package:shopping_list/providers/groceries_provider.dart';
+
+class AddItemScreen extends ConsumerStatefulWidget {
   const AddItemScreen({super.key});
 
   @override
-  State<AddItemScreen> createState() => _AddItemScreenState();
+  ConsumerState<AddItemScreen> createState() => _AddItemScreenState();
 }
 
-class _AddItemScreenState extends State<AddItemScreen> {
+class _AddItemScreenState extends ConsumerState<AddItemScreen> {
+  final _formKey = GlobalKey<FormState>();
+  String _nameInput = '';
+  int _quantityInput = 1;
+  Category _categoryInput = categories[Categories.vegetables]!;
+
+  void _saveItem() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      ref.read(groceryProvider.notifier).addGrocery(
+            GroceryItem(
+              id: DateTime.now().toString(),
+              name: _nameInput,
+              quantity: _quantityInput,
+              category: _categoryInput,
+            ),
+          );
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,6 +43,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
       body: Padding(
         padding: const EdgeInsets.all(10),
         child: Form(
+          key: _formKey,
           child: Column(
             children: [
               TextFormField(
@@ -28,13 +52,16 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   label: Text('Name'),
                 ),
                 validator: (value) {
-                  if (value.isNull || value!.isEmpty) {
+                  if (value == null || value.isEmpty) {
                     return "Item name is required!";
                   }
-                  if (value.trim().length <= 2 || value.trim().length > 50) {
+                  if (value.trim().length < 2 || value.trim().length > 50) {
                     return "Item name must be between 2 and 50 caracters.";
                   }
                   return null;
+                },
+                onSaved: (newValue) {
+                  _nameInput = newValue!;
                 },
               ),
               Row(
@@ -48,7 +75,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                       initialValue: '1',
                       keyboardType: TextInputType.number,
                       validator: (value) {
-                        if (value.isNull || value!.isEmpty) {
+                        if (value == null || value.isEmpty) {
                           return "Item quantity is required!";
                         }
                         if (int.tryParse(value) == null) {
@@ -59,6 +86,9 @@ class _AddItemScreenState extends State<AddItemScreen> {
                         }
                         return null;
                       },
+                      onSaved: (newValue) {
+                        _quantityInput = int.parse(newValue!);
+                      },
                     ),
                   ),
                   const SizedBox(
@@ -66,6 +96,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   ),
                   Expanded(
                     child: DropdownButtonFormField(
+                      value: _categoryInput,
                       items: [
                         for (final category in categories.entries)
                           DropdownMenuItem(
@@ -90,6 +121,9 @@ class _AddItemScreenState extends State<AddItemScreen> {
                           ),
                       ],
                       onChanged: (value) {},
+                      onSaved: (newValue) {
+                        _categoryInput = newValue!;
+                      },
                     ),
                   ),
                 ],
@@ -101,11 +135,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _formKey.currentState!.reset();
+                    },
                     child: const Text('Clear'),
                   ),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: _saveItem,
                     child: const Text('Add item'),
                   ),
                 ],
