@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
 import 'package:shopping_list/data/categories.dart';
 
@@ -25,7 +27,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 decoration: const InputDecoration(
                   label: Text('Name'),
                 ),
-                validator: (value) => "ERROR...",
+                validator: (value) {
+                  if (value.isNull || value!.isEmpty) {
+                    return "Item name is required!";
+                  }
+                  if (value.trim().length <= 2 || value.trim().length > 50) {
+                    return "Item name must be between 2 and 50 caracters.";
+                  }
+                  return null;
+                },
               ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -37,6 +47,18 @@ class _AddItemScreenState extends State<AddItemScreen> {
                       ),
                       initialValue: '1',
                       keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value.isNull || value!.isEmpty) {
+                          return "Item quantity is required!";
+                        }
+                        if (int.tryParse(value) == null) {
+                          return "Item quantity must be a number.";
+                        }
+                        if (int.tryParse(value)! <= 0) {
+                          return "Item quantity must be a positive number.";
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   const SizedBox(
@@ -87,7 +109,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                     child: const Text('Add item'),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),
