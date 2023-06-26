@@ -23,6 +23,44 @@ class _GroceriesScreenState extends ConsumerState<GroceriesScreen> {
   @override
   Widget build(BuildContext context) {
     final groceriesItem = ref.watch(groceryProvider);
+
+    Widget mainContent = groceriesItem.isEmpty
+        ? const Center(
+            child: Text(
+              'Ow!  There is no groceries found',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 20,
+              ),
+            ),
+          )
+        : ListView.builder(
+            itemCount: groceriesItem.length,
+            itemBuilder: (ctx, index) => ListTile(
+              onTap: () {},
+              leading: Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: groceriesItem[index].category.color,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              title: Text(
+                groceriesItem[index].name,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              trailing: Text(
+                groceriesItem[index].quantity.toString(),
+                style: const TextStyle(
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          );
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your groceries'),
@@ -33,33 +71,7 @@ class _GroceriesScreenState extends ConsumerState<GroceriesScreen> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: groceriesItem.length,
-        itemBuilder: (ctx, index) => ListTile(
-          onTap: () {},
-          leading: Container(
-            width: 30,
-            height: 30,
-            decoration: BoxDecoration(
-              color: groceriesItem[index].category.color,
-              borderRadius: BorderRadius.circular(5),
-            ),
-          ),
-          title: Text(
-            groceriesItem[index].name,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          trailing: Text(
-            groceriesItem[index].quantity.toString(),
-            style: const TextStyle(
-              fontSize: 14,
-            ),
-          ),
-        ),
-      ),
+      body: mainContent,
     );
   }
 }
