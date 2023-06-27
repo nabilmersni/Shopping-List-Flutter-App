@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:shopping_list/data/categories.dart';
 import 'package:shopping_list/models/category.dart';
@@ -30,6 +33,21 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
               category: _categoryInput,
             ),
           );
+      final url = Uri.https(
+          'flutter-28010-default-rtdb.firebaseio.com', 'shopping_list.json');
+      http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(
+          {
+            'name': _nameInput,
+            'quantity': _quantityInput,
+            'category': _categoryInput.title,
+          },
+        ),
+      );
       Navigator.of(context).pop();
     }
   }
