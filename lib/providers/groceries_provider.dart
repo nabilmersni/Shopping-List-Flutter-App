@@ -18,6 +18,10 @@ class GroceriesNotifier extends StateNotifier<List<GroceryItem>> {
     copy.insert(index, itemToInsert);
     state = copy;
   }
+
+  void loadgrocery(List<GroceryItem> loadedItems) {
+    state = loadedItems;
+  }
 }
 
 final groceryProvider =

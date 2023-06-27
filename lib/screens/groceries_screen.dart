@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
+import 'package:shopping_list/data/categories.dart';
+import 'package:shopping_list/models/grocery_item.dart';
 
 import 'package:shopping_list/providers/groceries_provider.dart';
 import 'package:shopping_list/screens/add_item_screen.dart';
@@ -12,12 +17,40 @@ class GroceriesScreen extends ConsumerStatefulWidget {
 }
 
 class _GroceriesScreenState extends ConsumerState<GroceriesScreen> {
-  void addItem() {
+  @override
+  void initState() {
+    super.initState();
+    _loadItem();
+  }
+
+  void _addItem() {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) => const AddItemScreen(),
       ),
     );
+  }
+
+  void _loadItem() async {
+    final url = Uri.https(
+        'flutter-28010-default-rtdb.firebaseio.com', 'shopping_list.json');
+    final response = await http.get(url);
+    final Map<String, dynamic> loadedData = json.decode(response.body);
+    final List<GroceryItem> loadedItems = [];
+    for (final item in loadedData.entries) {
+      final category = categories.entries.firstWhere(
+        (catItem) => catItem.value.title == item.value['category'],
+      );
+      loadedItems.add(
+        GroceryItem(
+          id: item.key,
+          name: item.value['name'],
+          quantity: item.value['quantity'],
+          category: category.value,
+        ),
+      );
+    }
+    ref.read(groceryProvider.notifier).loadgrocery(loadedItems);
   }
 
   @override
@@ -106,7 +139,7 @@ class _GroceriesScreenState extends ConsumerState<GroceriesScreen> {
         title: const Text('Your groceries'),
         actions: [
           IconButton(
-            onPressed: addItem,
+            onPressed: _addItem,
             icon: const Icon(Icons.add),
           ),
         ],

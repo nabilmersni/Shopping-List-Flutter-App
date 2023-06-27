@@ -22,7 +22,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   int _quantityInput = 1;
   Category _categoryInput = categories[Categories.vegetables]!;
 
-  void _saveItem() {
+  void _saveItem() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       ref.read(groceryProvider.notifier).addGrocery(
@@ -35,7 +35,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
           );
       final url = Uri.https(
           'flutter-28010-default-rtdb.firebaseio.com', 'shopping_list.json');
-      http.post(
+      final response = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json',
@@ -48,6 +48,9 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
           },
         ),
       );
+      if (!context.mounted) {
+        return;
+      }
       Navigator.of(context).pop();
     }
   }
