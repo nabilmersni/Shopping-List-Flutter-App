@@ -8,6 +8,16 @@ class GroceriesNotifier extends StateNotifier<List<GroceryItem>> {
   void addGrocery(GroceryItem item) {
     state = [...state, item];
   }
+
+  void deleteGrocery(GroceryItem itemToDel) {
+    state = state.where((item) => itemToDel != item).toList();
+  }
+
+  void insertGrocery(GroceryItem itemToInsert, int index) {
+    var copy = state.map((e) => e).toList();
+    copy.insert(index, itemToInsert);
+    state = copy;
+  }
 }
 
 final groceryProvider =

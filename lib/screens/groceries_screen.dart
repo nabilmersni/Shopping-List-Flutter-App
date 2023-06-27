@@ -29,34 +29,74 @@ class _GroceriesScreenState extends ConsumerState<GroceriesScreen> {
             child: Text(
               'Ow!  There is no groceries found',
               style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 20,
+                fontSize: 18,
               ),
             ),
           )
         : ListView.builder(
             itemCount: groceriesItem.length,
-            itemBuilder: (ctx, index) => ListTile(
-              onTap: () {},
-              leading: Container(
-                width: 30,
-                height: 30,
+            itemBuilder: (ctx, index) => Dismissible(
+              direction: DismissDirection.endToStart,
+              key: ObjectKey(groceriesItem[index]),
+              background: Container(
                 decoration: BoxDecoration(
-                  color: groceriesItem[index].category.color,
-                  borderRadius: BorderRadius.circular(5),
+                  color: const Color(0xfffc5185),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Icon(Icons.delete),
+                    SizedBox(
+                      width: 15,
+                    ),
+                  ],
                 ),
               ),
-              title: Text(
-                groceriesItem[index].name,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
+              onDismissed: (direction) {
+                ref
+                    .read(groceryProvider.notifier)
+                    .deleteGrocery(groceriesItem[index]);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('grocery deleted'),
+                    action: SnackBarAction(
+                      label: 'Cancel',
+                      onPressed: () {
+                        ref
+                            .read(groceryProvider.notifier)
+                            .insertGrocery(groceriesItem[index], index);
+                      },
+                    ),
+                  ),
+                );
+              },
+              child: ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-              ),
-              trailing: Text(
-                groceriesItem[index].quantity.toString(),
-                style: const TextStyle(
-                  fontSize: 14,
+                onTap: () {},
+                leading: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: groceriesItem[index].category.color,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                title: Text(
+                  groceriesItem[index].name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                trailing: Text(
+                  groceriesItem[index].quantity.toString(),
+                  style: const TextStyle(
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),
